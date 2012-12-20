@@ -1,0 +1,9 @@
+*.pyc
+*egg-info*
+output/
+output-long/
+artifacts/
+logs/
+*.swp
+build
+dist
