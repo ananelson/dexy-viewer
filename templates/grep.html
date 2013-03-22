@@ -1,4 +1,4 @@
-$def with (artifacts, expr, keyexpr)
+$def with (matches, expr, keyexpr)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -117,19 +117,21 @@ $def with (artifacts, expr, keyexpr)
             $if expr:
               <p>Here are your results for '$(expr)':</p>
 
-        $for artifact in artifacts:
+        $for data in matches:
           <div class="artifact">
-          <h2>$artifact.key</h2>
+          <h2>$data.key</h2>
           <p>
-            <a class="preview button" x="$artifact.hashstring" title="$artifact.key" href="/doc/$artifact.hashstring">preview</a>
-            <input id="$artifact.hashstring" type="text" value="{{ d['$artifact.key'] }}" />
+            <a class="preview button" x="$data.storage_key" title="$data.key" href="/doc/$data.storage_key">preview</a>
+            <input id="$data.storage_key" type="text" value="{{ d['$data.key'] }}" />
             </p>
 
-           $for i, k in enumerate(artifact.keys()):
+           $for i, k in enumerate(data.keys()):
               $if (keyexpr and keyexpr in k) or (not keyexpr and i < 50):
                 <p>
-                <a class="preview button" x="$artifact.hashstring--$k" title="$artifact.key:$k" href="/snip/$artifact.hashstring/$k">preview</a>
-                <input id="$artifact.hashstring--$k" type="text" value="{{ d['$artifact.key']['$k'] }}" />
+                <a class="preview button" x="$data.storage_key--$k" title="$data.key:$k" href="/snip/$data.storage_key/$k">preview</a>
+                <input id="$data.storage_key--$k" type="text" value="{{ d['$data.key']['$k'] }}" />
+                $if len(k) > 50:
+                    <span style="margin-left: 60px; font-size: x-small;">$k</span>
                 </p>
               $elif not keyexpr and i == 50:
                  <p>Only showing first $i records.</p>

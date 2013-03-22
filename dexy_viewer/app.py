@@ -1,7 +1,9 @@
 import web
 import os
-import dexy.wrapper
 import json
+from dexy.commands.utils import init_wrapper
+from operator import attrgetter
+from dexy.batch import Batch
 
 urls = (
         '/favicon.ico', 'favicon',
@@ -13,6 +15,8 @@ urls = (
         )
 
 render = web.template.render(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../templates'))
+
+wrapper = init_wrapper({})
 
 def wrap_content(content, ext):
     # Add other extensions here with special handling needs. Default is wrapped in <pre> tags.
@@ -27,62 +31,43 @@ class favicon:
 
 class grep:
     def GET(self, expr, keyexpr=None):
-        print "in grep/GET with expr '%s'" % expr
-        wrapper = dexy.wrapper.Wrapper()
-        wrapper.setup_read()
+        batch = Batch.load_most_recent(wrapper)
 
         if not expr:
-            # Show first 20 records
-            rows = wrapper.db.docs(20)
+            matches = sorted([data for data in batch], key=attrgetter('key'))[0:20]
         else:
-            # Show whatever matches the query text using sql like %expr% matching
-            rows = wrapper.db.query_docs("%%%s%%" % expr)
+            matches = sorted([data for data in batch if expr in data.key], key=attrgetter('key'))
 
-        artifacts = []
-
-        for row in rows:
-            data = wrapper.db.find_filter_artifact_for_doc_key(row['key'])
-            if data:
-                artifacts.append(data)
-
-        return render.grep(artifacts, expr, keyexpr)
+        return render.grep(matches, expr, keyexpr)
 
 class raw:
-    def GET(self, hashstring):
-        wrapper = dexy.wrapper.Wrapper()
-        wrapper.setup_read()
-
-        data = wrapper.db.find_filter_artifact_for_hashstring(hashstring)
+    def GET(self, storage_key):
+        batch = Batch.load_most_recent(wrapper)
+        data = batch.data_for_storage_key(storage_key)
         return data.data()
 
 class document:
-    def GET(self, hashstring):
-        wrapper = dexy.wrapper.Wrapper()
-        wrapper.setup_read()
-
-        data = wrapper.db.find_filter_artifact_for_hashstring(hashstring)
+    def GET(self, storage_key):
+        batch = Batch.load_most_recent(wrapper)
+        data = batch.data_for_storage_key(storage_key, 'output')
 
         if data.ext in (".png", ".jpg"): # Add any other image formats here.
-            return """<img title="%s" src="/raw/%s" />""" % (data.key, hashstring)
+            return """<img title="%s" src="/raw/%s" />""" % (data.key, storage_key)
         else:
             try:
                 uc = unicode(data)
                 json.dumps(uc)
                 return wrap_content(uc, data.ext)
             except Exception:
-                return """<a href="/raw/%s">download</a>""" % hashstring
+                return """<a href="/raw/%s">download</a>""" % storage_key
 
 class snippet:
-    def GET(self, hashstring, snippet_key):
-        wrapper = dexy.wrapper.Wrapper()
-        wrapper.setup_read()
-
-        data = wrapper.db.find_filter_artifact_for_hashstring(hashstring)
+    def GET(self, storage_key, snippet_key):
+        batch = Batch.load_most_recent(wrapper)
+        data = batch.data_for_storage_key(storage_key, 'output')
         return wrap_content(data[snippet_key], data.ext)
 
 app = web.application(urls, globals())
 
 if __name__ == "__main__":
     app.run()
-
-import dexy.utils
