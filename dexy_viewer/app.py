@@ -44,12 +44,18 @@ class raw:
     def GET(self, storage_key):
         batch = Batch.load_most_recent(wrapper)
         data = batch.data_for_storage_key(storage_key)
-        return data.data()
+        try:
+            json.dumps(unicode(data))
+            return unicode(data)
+        except UnicodeDecodeError:
+            return data.data()
+
+# TODO fix raw/document output for sectioned/key-value data
 
 class document:
     def GET(self, storage_key):
         batch = Batch.load_most_recent(wrapper)
-        data = batch.data_for_storage_key(storage_key, 'output')
+        data = batch.data_for_storage_key(storage_key)
 
         if data.ext in (".png", ".jpg"): # Add any other image formats here.
             return """<img title="%s" src="/raw/%s" />""" % (data.key, storage_key)
@@ -64,7 +70,7 @@ class document:
 class snippet:
     def GET(self, storage_key, snippet_key):
         batch = Batch.load_most_recent(wrapper)
-        data = batch.data_for_storage_key(storage_key, 'output')
+        data = batch.data_for_storage_key(storage_key)
         return wrap_content(data[snippet_key], data.ext)
 
 app = web.application(urls, globals())
