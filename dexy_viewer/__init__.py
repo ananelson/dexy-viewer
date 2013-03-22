@@ -1,6 +1,7 @@
 from dexy.plugin import Command
-import web
 from middleware import StaticMiddleware
+import socket
+import web
 
 class ViewerCommand(Command):
     """
@@ -25,12 +26,14 @@ def viewer_command(
 
     server = web.httpserver.WSGIServer(server_address, func)
 
-    print "http://%s:%d/" % server_address
-    print "Type ctrl+c to stop the server."
+    print "launching viewer at http://%s:%d/" % server_address
+    print "type ctrl+c to stop the server."
     try:
         server.start()
     except KeyboardInterrupt:
         server.stop()
+    except socket.error:
+        print "ERROR port %s already in use, server not started" % port
 
 def ping_command():
     print "pong"
