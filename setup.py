@@ -5,7 +5,6 @@ setup(
         author_email='ana@ananelson.com',
         include_package_data = True,
         install_requires = [
-            'dexy>=0.9.6',
             'web.py'
             ],
         name='dexy_viewer',
