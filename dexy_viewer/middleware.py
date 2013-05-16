@@ -3,7 +3,7 @@ import os
 
 class CustomStaticApp(web.httpserver.StaticApp):
     def translate_path(self, path):
-        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", path.lstrip("/"))
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
 
 import posixpath
 import urllib

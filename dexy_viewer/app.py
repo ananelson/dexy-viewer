@@ -14,7 +14,7 @@ urls = (
         '/(.*)', 'grep'
         )
 
-render = web.template.render(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../templates'))
+render = web.template.render(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates'))
 
 wrapper = init_wrapper({})
 

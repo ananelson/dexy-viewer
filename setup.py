@@ -10,7 +10,7 @@ setup(
         name='dexy_viewer',
         packages=find_packages(),
         url='http://dexy.it',
-        version="0.0.2"
+        version="0.0.4"
         )
 
 

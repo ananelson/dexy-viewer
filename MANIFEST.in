@@ -1,2 +1,1 @@
-graft templates
-graft static
+graft dexy_viewer
