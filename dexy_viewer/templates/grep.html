@@ -120,8 +120,8 @@ $def with (matches, expr, keyexpr)
         $for data in matches:
           <div class="artifact">
               <h2>$data.key</h2>
-            $if data.args.get('shortcut', False):
-              <h2>shortcut: '$data.args.get('shortcut')'</h2>
+            $if data.setting('shortcut'):
+              <h2>shortcut: '$data.setting('shortcut')'</h2>
           <p>
             <a class="preview button" x="$data.storage_key" title="$data.key" href="/doc/$data.storage_key">preview</a>
             <input id="$data.storage_key" type="text" value="{{ d['$data.key'] }}" />
